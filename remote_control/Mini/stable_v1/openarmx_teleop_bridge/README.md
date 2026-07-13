@@ -5,6 +5,46 @@ This package provides a robust bimanual teleoperation pipeline:
 - Bridge: ROS2 nodes that apply unit conversion, soft limits, anti-jitter filtering, and rate limiting
 - Follower: OpenArmX bimanual robot running `forward_position_controller`
 
+## Quick Run
+
+1. Terminal 1
+
+```bash
+source /opt/ros/humble/setup.bash
+cd /home/will/lerobot/openarmx_ws
+source install/setup.bash
+ros2 launch openarmx_bringup openarmx.bimanual.launch.py \
+  right_can_interface:=can0 \
+  left_can_interface:=can1 \
+  control_mode:=mit \
+  robot_controller:=forward_position_controller
+```
+
+2. Terminal 2
+
+```bash
+source /opt/ros/humble/setup.bash
+cd /home/will/lerobot/openarmx_ws
+source install/setup.bash
+ros2 launch openarmx_teleop_bridge mini_to_openarmx_bimanual.launch.py
+```
+
+3. Terminal 3
+
+```bash
+source /home/will/lerobot/.venv/bin/activate
+python /home/will/lerobot/openarmx_ws/src/openarmx_teleop_bridge/openarmx_teleop_bridge/mini_udp_sender_bimanual.py \
+  --right-teleop-port /dev/ttyACM0 \
+  --right-teleop-id my_openarm_mini_right \
+  --left-teleop-port /dev/ttyACM1 \
+  --left-teleop-id my_openarm_mini_left \
+  --right-udp-host 127.0.0.1 \
+  --right-udp-port 17777 \
+  --left-udp-host 127.0.0.1 \
+  --left-udp-port 17778 \
+  --rate-hz 150
+```
+
 ## 1. Environment Model
 
 Use different environments per terminal:
